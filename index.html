@@ -1,71 +1,1416 @@
-<!doctype html>
-<html>
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <title>siterows by xqian</title>
+<!DOCTYPE html>
 
-    <link rel="stylesheet" href="stylesheets/styles.css">
-    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
-    <!--[if lt IE 9]>
-    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-  </head>
-  <body>
-    <div class="wrapper">
-      <header>
-        <h1>siterows</h1>
-        <p>siterows.com</p>
+<html lang="en">
+<head>
+<title>Siterow - Stick with us, stay cool!</title>
+<meta charset="utf-8">
 
-        <p class="view"><a href="https://github.com/xqian/siterows">View the Project on GitHub <small>xqian/siterows</small></a></p>
+<style type="text/css">
+
+.title_fonts {
+    position:relative;
+    top: -3px;
+	font-family: Comic Sans MS, cursive;
+	font-size: xx-large;
+}
+
+.SelectSitesIcon {
+	
+}
+
+.SelectSitesName {
+	height: 10px;
+	width: 80px;
+}
+
+.selectedIconImg {
+	height: 80px;
+	width: 80px;
+}
+
+.heading-A {
+	font-family: "Comic Sans MS", cursive;
+	font-size: small;
+}
+
+.header
+{
+    width: 100%;
+    height: 120px;
+    background-color: #396A92;
+    /*background-image:url('/siterows/static/head_bg.gif');*/
+}
+
+.title_table
+{
+    height: 120px;    
+}
+
+.foot_div
+{
+    height: 100px;
+    background-color: #396A92;
+    /*background-image:url('/siterows/static/foot_bg.gif');*/
+}
+
+.padding_div_before_foot
+{
+    width: 100%;
+    height: 20px;
+}
+
+body {
+	font-family: verdana, Helvetica, sans-serif;
+}
+</style>
+<script>
+
+/*
+ 
+ * script todo list
+ *  use cache to make getIndexById and getFavoriteIndexById and find_site_obj_index_from_pos hagve O(1) complexcity
+ * */
+
+debug = 0
+local_icons = 1
+using_default_favorites = 1
 
 
-        <ul>
-          <li><a href="https://github.com/xqian/siterows/zipball/master">Download <strong>ZIP File</strong></a></li>
-          <li><a href="https://github.com/xqian/siterows/tarball/master">Download <strong>TAR Ball</strong></a></li>
-          <li><a href="https://github.com/xqian/siterows">View On <strong>GitHub</strong></a></li>
-        </ul>
-      </header>
-      <section>
-        <h3>
-<a name="welcome-to-github-pages-for-siterows" class="anchor" href="#welcome-to-github-pages-for-siterows"><span class="octicon octicon-link"></span></a>Welcome to GitHub Pages (for siterows).</h3>
+function my_print(str){
+    if (debug) {
+        console.log(str);
+    }
+}
 
-<p>This automatic page generator is the easiest way to create beautiful pages for all of your projects. Author your page content here using GitHub Flavored Markdown, select a template crafted by a designer, and publish. After your page is generated, you can check out the new branch:</p>
 
-<pre><code>$ cd your_repo_root/repo_name
-$ git fetch origin
-$ git checkout gh-pages
-</code></pre>
+function saveToWebStorage(index, favoriteId) {
+    if (typeof (Storage) !== "undefined") {
+        my_print("localStorage["+index+"]"+"="+favoriteId)
+        localStorage[index] = favoriteId;
+    } else {
+        document.getElementById("result").innerHTML = "Sorry, your browser does not support web storage...";
+    }
+}
 
-<p>If you're using the GitHub for Mac, simply sync your repository and you'll see the new branch.</p>
+function clearFromWebStorage() {
+    for ( var row = 1; row <= 2; row++) {
+        for ( var i = 0; i < FavoriteRow["row1"].length; i++) {
+            index = (row - 1) * FavoriteRow["row1"].length + i;
+            localStorage.removeItem('favorite_' + index);
+        }
+    }
+}
 
-<h3>
-<a name="designer-templates" class="anchor" href="#designer-templates"><span class="octicon octicon-link"></span></a>Designer Templates</h3>
+function ReadFromWebStorage(index) {
+    if (typeof (Storage) !== "undefined") {
+        return localStorage[index];
+    } else {
+        document.getElementById("result").innerHTML = "Sorry, your browser does not support web storage...";
+    }
+}
 
-<p>We've crafted some handsome templates for you to use. Go ahead and continue to layouts to browse through them. You can easily go back to edit your page before publishing. After publishing your page, you can revisit the page generator and switch to another theme. Your Page content will be preserved if it remained markdown format.</p>
+function savePosToWebStorage(id, pos) {
+    if (typeof (Storage) !== "undefined") {
+        localStorage[id] = pos;
+    } else {
+        document.getElementById("result").innerHTML = "Sorry, your browser does not support web storage...";
+    }
+}
 
-<h3>
-<a name="rather-drive-stick" class="anchor" href="#rather-drive-stick"><span class="octicon octicon-link"></span></a>Rather Drive Stick?</h3>
+function clearPosFromWebStorage() {
+    for ( i = 0; i < SiteObjects.length; i++)
+            localStorage.removeItem(id);
+}
 
-<p>If you prefer to not use the automatic generator, push a branch named <code>gh-pages</code> to your repository to create a page manually. In addition to supporting regular HTML content, GitHub Pages support Jekyll, a simple, blog aware static site generator written by our own Tom Preston-Werner. Jekyll makes it easy to create site-wide headers and footers without having to copy them across every page. It also offers intelligent blog support and other advanced templating features.</p>
+function ReadPosFromWebStorage(id) {
+    if (typeof (Storage) !== "undefined") {
+        return localStorage[id];
+    } else {
+        document.getElementById("result").innerHTML = "Sorry, your browser does not support web storage...";
+    }
+}
 
-<h3>
-<a name="authors-and-contributors" class="anchor" href="#authors-and-contributors"><span class="octicon octicon-link"></span></a>Authors and Contributors</h3>
 
-<p>You can <a href="https://github.com/blog/821" class="user-mention">@mention</a> a GitHub username to generate a link to their profile. The resulting <code>&lt;a&gt;</code> element will link to the contributor's GitHub Profile. For example: In 2007, Chris Wanstrath (<a href="https://github.com/defunkt" class="user-mention">@defunkt</a>), PJ Hyett (<a href="https://github.com/pjhyett" class="user-mention">@pjhyett</a>), and Tom Preston-Werner (<a href="https://github.com/mojombo" class="user-mention">@mojombo</a>) founded GitHub.</p>
+function getFavoriteIndexById(id) {
+    for ( var row = 1; row <= 2; row++) {
+        for ( var i = 0; i < FavoriteRow["row1"].length; i++) {
+            index = (row - 1) * FavoriteRow["row1"].length + i;
+            if (localStorage["favorite_" + index] == id) {
+                return "favorite_" + index;
+            }
+        }
+    }
+}
 
-<h3>
-<a name="support-or-contact" class="anchor" href="#support-or-contact"><span class="octicon octicon-link"></span></a>Support or Contact</h3>
+//cache this relationship at beginning
+function getIndexById(id) {
+    for (i = 0; i < SiteObjects.length; i++) {
+        if (SiteObjects[i].id == id) {
+            return i;
+        }
+    }
+    return -1; // not found!
+}
 
-<p>Having trouble with Pages? Check out the documentation at <a href="http://help.github.com/pages">http://help.github.com/pages</a> or contact <a href="mailto:support@github.com">support@github.com</a> and we’ll help you sort it out.</p>
-      </section>
-      <footer>
-        <p>This project is maintained by <a href="https://github.com/xqian">xqian</a></p>
-        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
-      </footer>
-    </div>
-    <script src="javascripts/scale.fix.js"></script>
+function getIdByIndex(index) {
+    return SiteObjects[index].id; // not found!
+}
+
+function getFavoritePositionByFavoriteId(FavoriteId) {
+    return FavoriteId.substring(9, FavoriteId.length);
+}
+
+
+function put_site_id_to_favorite_pos(id, pos)
+{
+    var toId=""
+    if (0<=pos && pos<FavoriteRow_Item_count)
+    {
+        toId="favorite_"+pos
+    }
+    else
+    {
+        my_print("pass invalid pos:"+pos);
+        return;
+    }
     
-  </body>
+    var index = getIndexById(id);
+    
+    my_print("put "+SiteObjects[index].display+" with idex:"+index+", to pos:"+pos+", toId:"+toId)
+    
+    document.getElementById("favorite" + pos).site_index=index
+    
+    //img
+    var target = document.getElementById(toId);
+    target.setAttribute("src", SiteObjects[index].icon);
+    target.setAttribute("alt", SiteObjects[index].display);
+    
+    //A
+    var target2 = document.getElementById(toId + "_display");    
+    target2.setAttribute("href", SiteObjects[Number(index)].link);
+    target2.setAttribute("innerHTML", SiteObjects[Number(index)].display);
+    
+    //words
+    var target3 = document.getElementById(toId + "_display" + "_words");
+    target3.innerHTML = SiteObjects[Number(index)].display;
+}
+
+
+function swap_position(id1, id2)
+{
+    index1=getIndexById(id1);
+    index2=getIndexById(id2);
+    
+    pos1=SiteObjects[index1].position
+    pos2=SiteObjects[index2].position
+
+    put_site_id_to_favorite_pos(id2,pos1);
+    put_site_id_to_favorite_pos(id1,pos2);
+    
+    SiteObjects[index1].position=pos2;
+    SiteObjects[index2].position=pos1;
+}
+
+
+function onDrop(e) {
+    e.preventDefault();
+    var fromId = e.dataTransfer.getData("Text");
+
+    //swap_position(fromId, toId);
+    // now change the toId content.
+    var toId = e.target.id;
+    var pos=getFavoritePositionByFavoriteId(toId)
+    var index_on_post=document.getElementById("favorite" + pos).site_index
+
+    my_print( "drap, from:"+fromId+", to:"+toId
+            +", pos:"+getFavoritePositionByFavoriteId(toId)
+            +", pos's index:"+index_on_post);
+
+    swap_position(fromId,SiteObjects[index_on_post].id);
+
+    // Todo: Save to customer web storage.
+    saveToWebStorage(toId,fromId);
+}
+
+function onDragOver(e) {
+    e.preventDefault();
+}
+
+function onDragStart(e) {
+    e.dataTransfer.setData("Text", e.target.id);
+}
+
+/* Define the site list 
+ * 
+   The id in this array is different than the array index;
+   and id will never change to reserve customer's configuration
+ */
+var SiteObjects = [
+    {
+    //[1] news=========================
+    id : 0,
+    sitetype : "News",
+    display : "ABC News",
+    link : "http://www.abc.com",
+    icon : "/siterows/static/icons/abcnews.png"
+    },
+    {
+    id : 1,
+    sitetype : "News",
+    display : "CNN",
+    link : "http://www.cnn.com",
+    icon : "/siterows/static/icons/cnn.png"
+    },
+    {
+    id : 2,
+    sitetype : "News",
+    display : "Reuters",
+    link : "http://www.reuters.com",
+    icon : "/siterows/static/icons/reuters.jpg"
+    },
+    {
+    id : 3,
+    sitetype : "News",
+    display : "MSNBC",
+    link : "http://www.msn.com",
+    icon : "/siterows/static/icons/msnbc.png"
+    },
+    {
+    id : 4,
+    sitetype : "News",
+    display : "Fox Newsbing",
+    link : "http://www.foxnews.com",
+    icon : "/siterows/static/icons/foxnews.png"
+    },
+    {
+    id : 5,
+    sitetype : "News",
+    display : "CBS News",
+    link : "http://www.cbsnews.com",
+    icon : "/siterows/static/icons/temp.jpg"
+    },
+    //[2] music =========================
+    {
+    id : 24,
+    sitetype : "Music",
+    display : "Yahoo Music",
+    link : "http://music.yahoo.com",
+    icon : "/siterows/static/icons/yahoo.png"
+    },
+    {
+    id : 25,
+    sitetype : "Music",
+    display : "Pandora",
+    link : "http://www.pandora.com",
+    icon : "/siterows/static/icons/pandora.png"
+    },
+    {
+    id : 26,
+    sitetype : "Music",
+    display : "LastFM",
+    link : "http://www.last.fm",
+    icon : "/siterows/static/icons/lastfm.png"
+    },
+    {
+    id : 27,
+    sitetype : "Music",
+    display : "Playlist",
+    link : "http://www.playlist.com",
+    icon : "/siterows/static/icons/playlist.jpg"
+    },
+    {
+    id : 28,
+    sitetype : "Music",
+    display : "Google Music",
+    link : "https://music.google.com/music/listen",
+    icon : "/siterows/static/icons/googlemusic.png"
+    },
+    {
+    id : 29,
+    sitetype : "Music",
+    display : "Vevo",
+    link : "http://www.vevo.com",
+    icon : "/siterows/static/icons/temp.jpg"
+    },
+
+    {
+    id : 42,
+    sitetype : "Video",
+    display : "Youtube",
+    link : "http://www.youtube.com",
+    icon : "/siterows/static/icons/YouTube.png"
+    },
+    {
+    id : 43,
+    sitetype : "Video",
+    display : "Hulu",
+    link : "http://www.hulu.com",
+    icon : "/siterows/static/icons/hulu.png"
+    },
+    {
+    id : 44,
+    sitetype : "Video",
+    display : "Netflix",
+    link : "http://www.netflix.com",
+    icon : "/siterows/static/icons/netflix.png"
+    },
+    {
+    id : 46,
+    sitetype : "Video",
+    display : "Bing Video",
+    link : "http://www.bing.com/videos/browse",
+    icon : "/siterows/static/icons/bingvideo.png"
+    },
+    {
+    id : 47,
+    sitetype : "Video",
+    display : "Sopcast",
+    link : "http://www.sopcast.com",
+    icon : "/siterows/static/icons/sopcast.gif"
+    },
+    {
+    id : 45,
+    sitetype : "Video",
+    display : "Vimeo",
+    link : "http://www.vimeo.com",
+    icon : "/siterows/static/icons/temp.jpg"
+    },
+
+    {
+    id : 18,
+    sitetype : "Social",
+    display : "Facebook",
+    link : "http://www.facebook.com",
+    icon : "/siterows/static/icons/facebook.png"
+    },
+    {
+    id : 19,
+    sitetype : "Social",
+    display : "Twitter",
+    link : "http://www.twitter.com",
+    icon : "/siterows/static/icons/twitter.png"
+    },
+    {
+    id : 20,
+    sitetype : "Social",
+    display : "Pinterest",
+    link : "http://pinterest.com",
+    icon : "/siterows/static/icons/pinterest1.png"
+    },
+    {
+    id : 21,
+    sitetype : "Social",
+    display : "LinkedIn",
+    link : "http://www.linkedin.com",
+    icon : "/siterows/static/icons/linkedin.png"
+    },
+    {
+    id : 22,
+    sitetype : "Social",
+    display : "Google+",
+    link : "http://plus.google.com",
+    icon : "/siterows/static/icons/googleplus.png"
+    },
+    {
+    id : 23,
+    sitetype : "Social",
+    display : "Yelp",
+    link : "http://www.yelp.com",
+    icon : "/siterows/static/icons/temp.jpg"
+    },
+
+    {
+    id : 48,
+    sitetype : "Movie",
+    display : "Fandango",
+    link : "http://www.fandango.com",
+    icon : "/siterows/static/icons/fandango.png"
+    },
+    {
+    id : 49,
+    sitetype : "Movie",
+    display : "Regmovie",
+    link : "http://www.regmovies.com",
+    icon : "/siterows/static/icons/regmovie.jpg"
+    },
+    {
+    id : 50,
+    sitetype : "Movie",
+    display : "Flixster",
+    link : "http://www.flixster.com",
+    icon : "/siterows/static/icons/flixster.png"
+    },
+    {
+    id : 52,
+    sitetype : "Movie",
+    display : "Blockbuster",
+    link : "http://www.blockbuster.com",
+    icon : "/siterows/static/icons/blockbuster.jpg"
+    },
+    {
+    id : 53,
+    sitetype : "Movie",
+    display : "Redbox",
+    link : "http://www.redbox.com",
+    icon : "/siterows/static/icons/redbox.png"
+    },
+    {
+    id : 51,
+    sitetype : "Movie",
+    display : "IMDB",
+    link : "http://www.imdb.com",
+    icon : "/siterows/static/icons/temp.jpg"
+    },
+
+    {
+    id : 6,
+    sitetype : "Financial",
+    display : "Bloomberg",
+    link : "http://www.bloomberg.com",
+    icon : "/siterows/static/icons/bloomberg.png"
+    },
+    {
+    id : 7,
+    sitetype : "Financial",
+    display : "YahooFinancial",
+    link : "http://finance.yahoo.com",
+    icon : "/siterows/static/icons/yahoo.png"
+    },
+    {
+    id : 8,
+    sitetype : "Financial",
+    display : "Mint",
+    link : "http://www.mint.com",
+    icon : "/siterows/static/icons/mint.gif"
+    },
+    {
+    id : 10,
+    sitetype : "Financial",
+    display : "WSJ",
+    link : "http://online.wsj.com",
+    icon : "/siterows/static/icons/wsj.png"
+    },
+    {
+    id : 11,
+    sitetype : "Financial",
+    display : "GoogleFinance",
+    link : "http://www.google.com/finance",
+    icon : "/siterows/static/icons/googlefinance.png"
+    },
+    {
+    id : 9,
+    sitetype : "Financial",
+    display : "Pageonce",
+    link : "http://pageonce.com",
+    icon : "/siterows/static/icons/temp.jpg"
+    },
+
+    {
+    id : 12,
+    sitetype : "Email",
+    display : "Gmail",
+    link : "http://www.gmail.com",
+    icon : "/siterows/static/icons/gmail.png"
+    },
+    {
+    id : 13,
+    sitetype : "Email",
+    display : "Hotmail",
+    link : "http://www.hotmail.com",
+    icon : "/siterows/static/icons/hotmail.png"
+    },
+    {
+    id : 14,
+    sitetype : "Email",
+    display : "Yahoo",
+    link : "http://mai.yahoo.com",
+    icon : "/siterows/static/icons/yahoo-mail.png"
+    },
+    {
+    id : 15,
+    sitetype : "Email",
+    display : "AOL",
+    link : "http://mai.aol.com",
+    icon : "/siterows/static/icons/aol.png"
+    },
+    {
+    id : 16,
+    sitetype : "Email",
+    display : "Meebo",
+    link : "https://www.meebo.com",
+    icon : "/siterows/static/icons/meebo.jpg"
+    },
+    {
+    id : 17,
+    sitetype : "Email",
+    display : "Comcast",
+    link : "http://www.comcast.com",
+    icon : "/siterows/static/icons/temp.jpg"
+    },
+
+    /*
+    * {id:30,
+    * sitetype:"Sports",display:"NHL",link:"http://www.nhl.com/",icon:"/siterows/static/icons/://images.apple.com/home/images/macbookpro_video_hero.jpg"},
+    * {id:31,
+    * sitetype:"Sports",display:"ESPN",link:"http://www.espn.com/",icon:"/siterows/static/icons/://images.apple.com/home/images/macbookpro_video_hero.jpg"},
+    * {id:32,
+    * sitetype:"Sports",display:"NBA",link:"http://www.nba.com/",icon:"/siterows/static/icons/://images.apple.com/home/images/macbookpro_video_hero.jpg"},
+    * {id:33,
+    * sitetype:"Sports",display:"Foxsports",link:"http://msn.foxsports.com/nfl",icon:"/siterows/static/icons/://images.apple.com/home/images/macbookpro_video_hero.jpg"},
+    * {id:34,
+    * sitetype:"Sports",display:"FIFA",link:"http://www.fifa.com/",icon:"/siterows/static/icons/://images.apple.com/home/images/macbookpro_video_hero.jpg"},
+    * {id:35,
+    * sitetype:"Sports",display:"UFC",link:"http://www.ufc.com/",icon:"/siterows/static/icons/://images.apple.com/home/images/macbookpro_video_hero.jpg"},
+    */
+
+    {
+    id : 36,
+    sitetype : "Travel",
+    display : "Expedia",
+    link : "http://www.expedia.com",
+    icon : "/siterows/static/icons/expedia.png"
+    },
+    {
+    id : 37,
+    sitetype : "Travel",
+    display : "Priceline",
+    link : "http://www.priceline.com",
+    icon : "/siterows/static/icons/priceline.png"
+    },
+    {
+    id : 38,
+    sitetype : "Travel",
+    display : "Orbitz",
+    link : "http://www.orbitz.com",
+    icon : "/siterows/static/icons/orbitz.png"
+    },
+    {
+    id : 40,
+    sitetype : "Travel",
+    display : "Hotwire",
+    link : "http://www.hotwire.com",
+    icon : "/siterows/static/icons/hotwire.png"
+    },
+    {
+    id : 41,
+    sitetype : "Travel",
+    display : "Hotels",
+    link : "http://www.hotels.com",
+    icon : "/siterows/static/icons/hotels.png"
+    },
+    {
+    id : 39,
+    sitetype : "Travel",
+    display : "Travelocity",
+    link : "http://www.travelocity.com",
+    icon : "/siterows/static/icons/temp.jpg"
+    },
+
+    {
+    id : 54,
+    sitetype : "Reading",
+    display : "Reddit",
+    link : "http://www.reddit.com",
+    icon : "/siterows/static/icons/reddit.png"
+    },
+    {
+    id : 55,
+    sitetype : "Reading",
+    display : "Wikipedia",
+    link : "http://en.wikipedia.org",
+    icon : "/siterows/static/icons/wikipedia.png"
+    },
+    {
+    id : 56,
+    sitetype : "Reading",
+    display : "Safari",
+    link : "http://www.safaribooksonline.com",
+    icon : "/siterows/static/icons/safaribooksonline.png"
+    },
+    {
+    id : 57,
+    sitetype : "Reading",
+    display : "Amazon books",
+    link : "http://www.amazon.com/books",
+    icon : "/siterows/static/icons/amazonbooks.png"
+    },
+    {
+    id : 58,
+    sitetype : "Reading",
+    display : "Google books",
+    link : "http://books.google.com",
+    icon : "/siterows/static/icons/googlebooks.png"
+    },
+    {
+    id : 59,
+    sitetype : "Reading",
+    display : "Barnes&amp;Noble",
+    link : "http://barnesandnoble.com",
+    icon : "/siterows/static/icons/temp.jpg"
+    },
+
+    {
+    id : 60,
+    sitetype : "Blog",
+    display : "Blogger",
+    link : "http://www.blogger.com",
+    icon : "/siterows/static/icons/blogger.png"
+    },
+    {
+    id : 61,
+    sitetype : "Blog",
+    display : "Wordpress",
+    link : "http://www.wordpress.com",
+    icon : "/siterows/static/icons/wordpress.png"
+    },
+    {
+    id : 62,
+    sitetype : "Blog",
+    display : "Techcrunch",
+    link : "http://techcrunch.com",
+    icon : "/siterows/static/icons/techcrunch.png"
+    },
+    {
+    id : 63,
+    sitetype : "Blog",
+    display : "Gizmodo",
+    link : "http://www.gizmodo.com",
+    icon : "/siterows/static/icons/gizmodo.png"
+    },
+    {
+    id : 64,
+    sitetype : "Blog",
+    display : "Tumblr",
+    link : "https://www.tumblr.com",
+    icon : "/siterows/static/icons/tumblr.png"
+    },
+    {
+    id : 65,
+    sitetype : "Blog",
+    display : "Huffington Post",
+    link : "http://technorati.com/blogs/www.huffingtonpost.com",
+    icon : "/siterows/static/icons/temp.jpg"
+    },
+
+    {
+    id : 66,
+    sitetype : "Deals",
+    display : "Dealsea",
+    link : "http://www.dealsea.com",
+    icon : "/siterows/static/icons/dealsea.jpg"
+    },
+    {
+    id : 67,
+    sitetype : "Deals",
+    display : "Fatwallet",
+    link : "http://www.fatwallet.com",
+    icon : "/siterows/static/icons/fatwallet.jpg"
+    },
+    {
+    id : 68,
+    sitetype : "Deals",
+    display : "Groupon",
+    link : "http://groupon.com",
+    icon : "/siterows/static/icons/groupon.png"
+    },
+    {
+    id : 69,
+    sitetype : "Deals",
+    display : "Slickdeal",
+    link : "http://slickdeals.net",
+    icon : "/siterows/static/icons/slickdeals.png"
+    },
+    {
+    id : 70,
+    sitetype : "Deals",
+    display : "Living Social",
+    link : "http://www.livingsocial.com",
+    icon : "/siterows/static/icons/livingsocial.png"
+    },
+    {
+    id : 71,
+    sitetype : "Deals",
+    display : "Shopping",
+    link : "http://www.shopping.com",
+    icon : "/siterows/static/icons/temp.jpg"
+    },
+
+    {
+    id : 72,
+    sitetype : "Auto",
+    display : "KBB",
+    link : "http://www.kbb.com",
+    icon : "/siterows/static/icons/kbb.png"
+    },
+    {
+    id : 73,
+    sitetype : "Auto",
+    display : "AutoTrader",
+    link : "http://www.autotrader.com",
+    icon : "/siterows/static/icons/autotrader.png"
+    },
+    {
+    id : 74,
+    sitetype : "Auto",
+    display : "Edmunds",
+    link : "http://www.edmunds.com",
+    icon : "/siterows/static/icons/edmunds.png"
+    },
+    {
+    id : 75,
+    sitetype : "Auto",
+    display : "Yahoo Auto",
+    link : "http://autos.yahoo.com",
+    icon : "/siterows/static/icons/yahooauto.png"
+    },
+    {
+    id : 76,
+    sitetype : "Auto",
+    display : "Truecar",
+    link : "http://www.truecar.com",
+    icon : "/siterows/static/icons/truecar.png"
+    },
+    {
+    id : 77,
+    sitetype : "Auto",
+    display : "Cars.com",
+    link : "http://www.cars.com",
+    icon : "/siterows/static/icons/temp.jpg"
+    },
+
+    {
+    id : 78,
+    sitetype : "RealEstate",
+    display : "Redfin",
+    link : "http://www.redfin.com",
+    icon : "/siterows/static/icons/redfin.png"
+    },
+    {
+    id : 79,
+    sitetype : "RealEstate",
+    display : "Apartments",
+    link : "http://www.apartments.com",
+    icon : "/siterows/static/icons/apartments.png"
+    },
+    {
+    id : 80,
+    sitetype : "RealEstate",
+    display : "Zillow",
+    link : "http://www.zillow.com",
+    icon : "/siterows/static/icons/zillow.png"
+    },
+    {
+    id : 81,
+    sitetype : "RealEstate",
+    display : "Mlslistings",
+    link : "http://www.mlslistings.com",
+    icon : "/siterows/static/icons/mlslisting.jpg"
+    },
+    {
+    id : 82,
+    sitetype : "RealEstate",
+    display : "Ziprealty",
+    link : "http://www.ziprealty.com",
+    icon : "/siterows/static/icons/ziprealty.png"
+    },
+    {
+    id : 83,
+    sitetype : "RealEstate",
+    display : "Rent.com",
+    link : "http://www.rent.com",
+    icon : "/siterows/static/icons/temp.jpg"
+    },
+
+    {
+    id : 85,
+    sitetype : "Shopping",
+    display : "Amazon",
+    link : "http://www.amazon.com",
+    icon : "/siterows/static/icons/amazon.png"
+    },
+    {
+    id : 86,
+    sitetype : "Shopping",
+    display : "Walmart",
+    link : "http://www.walmart.com",
+    icon : "/siterows/static/icons/walmart.png"
+    },
+    {
+    id : 87,
+    sitetype : "Shopping",
+    display : "Target",
+    link : "http://www.target.com",
+    icon : "/siterows/static/icons/target.png"
+    },
+    {
+    id : 84,
+    sitetype : "Shopping",
+    display : "Homedepot",
+    link : "http://www.homedepot.com",
+    icon : "/siterows/static/icons/homedepot.png"
+    },
+    {
+    id : 88,
+    sitetype : "Shopping",
+    display : "Sears",
+    link : "http://www.sears.com",
+    icon : "/siterows/static/icons/sears.png"
+    },
+    {
+    id : 89,
+    sitetype : "Shopping",
+    display : "Newegg",
+    link : "http://www.newegg.com",
+    icon : "/siterows/static/icons/temp.jpg"
+    },
+
+    {
+    id : 90,
+    sitetype : "Fashion",
+    display : "Gilt",
+    link : "http://www.gilt.com",
+    icon : "/siterows/static/icons/gilt.png"
+    },
+    {
+    id : 93,
+    sitetype : "Fashion",
+    display : "Neimanmarcus",
+    link : "http://www.neimanmarcus.com",
+    icon : "/siterows/static/icons/neimanmarcus.jpg"
+    },
+    {
+    id : 94,
+    sitetype : "Fashion",
+    display : "Nordstrom",
+    link : "http://shop.nordstrom.com",
+    icon : "/siterows/static/icons/nordstrom.png"
+    },
+    {
+    id : 95,
+    sitetype : "Fashion",
+    display : "Saksfifthavenue",
+    link : "http://www.saksfifthavenue.com",
+    icon : "/siterows/static/icons/saksfifthavenue.jpg"
+    },
+    {
+    id : 91,
+    sitetype : "Fashion",
+    display : "Myhabit",
+    link : "http://www.myhabit.com",
+    icon : "/siterows/static/icons/myhabit.png"
+    },
+    {
+    id : 92,
+    sitetype : "Fashion",
+    display : "Thinkgeek",
+    link : "http://www.thinkgeek.com",
+    icon : "/siterows/static/icons/temp.jpg"
+    },
+
+    {
+    id : 96,
+    sitetype : "Map",
+    display : "Google Map",
+    link : "http://maps.google.com",
+    icon : "/siterows/static/icons/googleearth.png"
+    },
+    {
+    id : 97,
+    sitetype : "Map",
+    display : "Mapquest",
+    link : "http://www.mapquest.com",
+    icon : "/siterows/static/icons/mapquest.png"
+    },
+    {
+    id : 98,
+    sitetype : "Map",
+    display : "Bing Map",
+    link : "http://www.bing.com/maps",
+    icon : "/siterows/static/icons/bingmap.png"
+    },
+    {
+    id : 99,
+    sitetype : "Map",
+    display : "Nokia Map",
+    link : "http://maps.nokia.com",
+    icon : "/siterows/static/icons/nokiamaps.png"
+    },
+    {
+    id : 100,
+    sitetype : "Map",
+    display : "Yahoo Map",
+    link : "http://maps.yahoo.com",
+    icon : "/siterows/static/icons/yahoo.png"
+    },
+    {
+    id : 101,
+    sitetype : "Map",
+    display : "Mappy",
+    link : "http://www.mappy.com",
+    icon : "/siterows/static/icons/temp.jpg"
+    },
+
+    {
+    id : 107,
+    sitetype : "PhotoAlbum",
+    display : "Pinterest",
+    link : "http://www.pinterest.com",
+    icon : "/siterows/static/icons/pinterest2.png"
+    },
+    {
+    id : 102,
+    sitetype : "PhotoAlbum",
+    display : "Flickr",
+    link : "http://www.flickr.com",
+    icon : "/siterows/static/icons/flickr.png"
+    },
+    {
+    id : 103,
+    sitetype : "PhotoAlbum",
+    display : "Shuttlefly",
+    link : "http://www.shutterfly.com",
+    icon : "/siterows/static/icons/shutterfly.png"
+    },
+    {
+    id : 104,
+    sitetype : "PhotoAlbum",
+    display : "Picasa",
+    link : "http://picasaweb.google.com",
+    icon : "/siterows/static/icons/picasa.png"
+    },
+    {
+    id : 105,
+    sitetype : "PhotoAlbum",
+    display : "Smugmug",
+    link : "http://www.smugmug.com",
+    icon : "/siterows/static/icons/smugmug.png"
+    },
+    {
+    id : 106,
+    sitetype : "PhotoAlbum",
+    display : "Imgur",
+    link : "http://imgur.com",
+    icon : "/siterows/static/icons/temp.jpg"
+    },
+    /*
+    * {id:108, sitetype:"Search Engine",display:
+    * "Google",link:"http://www.google.com/",icon:"/siterows/static/icons/://files.softicons.com/download/system-icons/windows-8-metro-invert-icons-by-dakirby309/png/64x64/Internet%20Shortcuts%20&%20Manufacturers/Google.png"},
+    * {id:109, sitetype:"Search Engine",display:
+    * "Bing",link:"http://www.bing.com/",icon:"/siterows/static/icons/://files.softicons.com/download/social-media-icons/free-social-icons-by-icondrawer/png/48x48/bing.png"},
+    * {id:110, sitetype:"Search Engine",display:
+    * "Yahoo",link:"http://www.yahoo.com/",icon:"/siterows/static/icons/://files.softicons.com/download/system-icons/windows-8-metro-invert-icons-by-dakirby309/png/64x64/Internet%20Shortcuts%20&%20Manufacturers/Yahoo!.png"},
+    * {id:111, sitetype:"Search Engine",display:
+    * "About.com",link:"http://www.about.com/",icon:"/siterows/static/icons/://images.apple.com/home/images/macbookpro_video_hero.jpg"},
+    * {id:112, sitetype:"Search Engine",display:
+    * "Ask.com",link:"http://www.ask.com/",icon:"/siterows/static/icons/://files.softicons.com/download/social-media-icons/social-media-icon-set-2-by-position-relative/png/64x64/ask.png"},
+    * {id:113, sitetype:"Search Engine",display:
+    * "Wolfram|Alpha",link:"http://www.wolframalpha.com/",icon:"/siterows/static/icons/://images.apple.com/home/images/macbookpro_video_hero.jpg"}
+    */
+    ];
+
+/* The default favorite */
+  var FavoriteRow =
+      {
+        row1 : [18, 42, 54, 3],
+        row2 : [8, 85, 107, 6]
+      };
+      
+      
+   var FavoriteRow_row_count=2;
+   var FavoriteRow_Item_count=FavoriteRow_row_count*FavoriteRow["row1"].length;   
+   
+   function find_site_obj_index_from_pos(pos)
+   {
+    for (i = 0; i < SiteObjects.length; i++) {
+        if (SiteObjects[i].position == pos) {
+            return i;
+        }
+    }
+    return -1; // not found!
+   }
+      
+function create_siterow()
+{
+
+    if (using_default_favorites)
+        clearFromWebStorage();
+
+    FavoriteRow_Item_count=FavoriteRow_row_count*FavoriteRow["row1"].length;
+    
+    for ( index = 0; index < SiteObjects.length; index++)
+    {
+        if (local_icons)
+        {
+        SiteObjects[index].icon = SiteObjects[index].icon.replace("/siterows/static/icons/", "./icons/");
+        SiteObjects[index].position = -1;
+        }
+    }
+    
+    
+    // Init favorite site from web storage
+    if (localStorage.getItem("favorite_0"))
+    {
+        if (debug)
+        {
+        console.log("working on with storage1, with 0:" + localStorage["favorite_0"]);
+        }
+
+        for (var row = 1; row <= FavoriteRow_row_count; row++)
+        {
+            for (var i = 0; i < FavoriteRow["row1"].length; i++)
+            {
+            var src_index = (row - 1) * (FavoriteRow["row1"].length) + i;
+            my_print("ReadFromWebStorage 0:" + ReadFromWebStorage("favorite_"+src_index));
+            var id = ReadFromWebStorage("favorite_" + src_index);
+            FavoriteRow["row" + row][i] = id;
+            var index=getIndexById(id)
+            SiteObjects[index].position = src_index;
+            }
+        }
+    }
+    else
+    {
+        if (debug)
+        {
+        console.log("working on with default, with 0:" + localStorage["favorite_0"]);
+        }
+        // write default into webstorage
+        for (var row = 1; row <= FavoriteRow_row_count; row++)
+            for (var i = 0; i < FavoriteRow["row1"].length; i++)
+                {
+                var pos = (row - 1) * (FavoriteRow["row" + row].length) + i;
+                var favorite_id = FavoriteRow["row" + row][i];
+                var index=getIndexById(favorite_id)
+                saveToWebStorage("favorite_" + pos, favorite_id);
+                my_print("get default, index:" + index + ", id:" + favorite_id+ ", pos:" +pos+", site:"+SiteObjects[index].display);
+                SiteObjects[index].position = pos;
+                }
+    }
+
+    if (debug)
+        for (var row = 1; row <= FavoriteRow_row_count; row++)
+        {
+            for (var i = 0; i < FavoriteRow["row1"].length; i++)
+            {
+            console.log("FavoriteRow after init, " + row + "," + i + "," + FavoriteRow["row" + row][i]);
+            }
+        }
+
+    create_favorite_table(FavoriteRow);
+    
+    create_site_objects_table();
+
+    updateSearchEngine();
+    }
+
+function create_favorite_table(FavoriteRow)
+{
+
+    if (debug)
+      for (var row = 1; row <= 2; row++)
+      {
+        for (var i = 0; i < FavoriteRow["row1"].length; i++)
+        {
+          console.log("FavoriteRow after init2, " + row + "," + i + "," + FavoriteRow["row" + row][i]);
+        }
+      }
+
+      // write favorite rows first.
+    var favoriterows = document.getElementById("favorite");
+    if (debug)
+    {
+      favoriterows.border = "1"
+    }
+
+    for (var row = 1; row <= 2; row++)
+    {
+      /*
+       * to generate the format like this,focus on the changing part. <td>
+       <table>
+       *
+       <tr>
+       <td width="25%" align="center" class="SelectSitesIcon"><a
+       * href="http://abcnews.go.com/"><img id=0
+       * src="http://a4.mzstatic.com/us/r1000/015/Purple/f5/a4/59/mzi.vsbtwajd.175x175-75.jpg"
+       * ALT="ABC" border="0" class="selectedIconImg" /> </a></td>
+       </tr>
+       <tr>
+       * <td align="center" class="SelectSitesName"><a
+       * href="http://abcnews.go.com/"> ABC News </a></td>
+       </tr>
+       </table></td>
+       */
+      var tr = document.createElement("tr");
+      favoriterows.appendChild(tr);
+
+      for ( i = 0; i < FavoriteRow["row" + row].length; i++)
+      {
+        
+        var td0 = document.createElement("td");
+
+        td0.width = "25%";
+        td0.align = "center";
+        tr.appendChild(td0);
+
+        var table = document.createElement("table");
+        table.align = "center";
+        td0.appendChild(table);
+        var tr2 = document.createElement("tr");
+        table.appendChild(tr2);
+
+        /* icon */
+        var td = document.createElement("td");
+        td.align = "center";
+        td.width = "100%";
+
+
+        //this is the hask key in FavoriteRow
+        // td.setAttribute("onDrop","onDrop(event)");
+        // td.setAttribute("onDragover","onDragOver(event)");
+        // location/position and in the favorite dispaly
+        // src_id is the posistion
+        var src_id = (row - 1) * (FavoriteRow["row" + row].length) + i;
+        
+        var index = find_site_obj_index_from_pos(src_id);
+        var id=SiteObjects[index].id;
+
+        my_print("working on favoritem, pos:" + src_id + ", id:" + id + ", index:" +index);
+        
+        td.id = "favorite" + src_id;
+        td.class = "SelectSitesIcon";
+        td.site_index = index;
+        my_print("current index:" + index + ", src_id:" + src_id);
+        td.innerHTML = '<a href=\"' + SiteObjects[index].link + '\">' + ' <img' + ' onDrop=onDrop(event) onDragover=onDragOver(event)' + ' id= ' + "favorite_" + src_id + ' src=\"' + SiteObjects[index].icon + '\" ' + ' ALT=\"' + SiteObjects[index].display + '\"' + ' border=\"0\" class=\"selectedIconImg\" />' + '  </a>';
+
+        tr2.appendChild(td);
+
+        /* the display */
+        var tr3 = document.createElement("tr");
+        table.appendChild(tr3);
+        var td2 = document.createElement("td");
+        td2.width = "100%";
+        td2.align = "center";
+        td2.id = "favorite" + id + "_display2";
+        td2.class = "SelectSitesName";
+        td2.innerHTML = '<a id=' + "favorite_" + src_id + "_display" + ' href=\"' + SiteObjects[index].link + '\">' + '<div id=' + "favorite_" + src_id + "_display_words>" + SiteObjects[index].display + ' </div> </a>';
+
+        tr3.appendChild(td2);
+      }
+    }
+    
+}
+
+function create_site_objects_table()
+{
+     // write static site rows then.
+    var sites = document.getElementById("sites");
+    if (debug)
+    {
+      sites.border = "1"
+    }
+
+    for ( i = 0; i < SiteObjects.length / 6; i++)
+    {
+      var tr = document.createElement("tr");
+      sites.appendChild(tr);
+      var td0 = document.createElement("td");
+
+      td0.width = "2%";
+      tr.appendChild(td0);
+
+      var td1 = document.createElement("td");
+      td1.innerHTML = SiteObjects[i * 6].sitetype;
+      tr.appendChild(td1);
+
+      for ( j = 0; j < 5; j++)
+      {        
+        var id = SiteObjects[i * 6 + j].id;
+        
+        var td2 = document.createElement("td");
+        //td will have same id as the object
+        td2.setAttribute("id", id);
+        td2.setAttribute("draggable", "true");
+        td2.setAttribute("ondragstart", "onDragStart(event)");
+
+        td2.innerHTML = '<a id=' + id + '  href=\"' + SiteObjects[i * 6 + j].link + '\">' + SiteObjects[i * 6 + j].display + '  </a>';
+        tr.appendChild(td2);
+      }
+    }
+}
+
+/* Define the search engine list */
+/*
+ * 
+ * <form id= "searchegnine" method="get" action="http://www.bing.com/search">
+ * <input type="hidden" name="cp" value="CODE PAGE USED BY YOUR HTML PAGE" />
+ * <input type="hidden" name="FORM" value="FREEWS" /> <table> <tr>
+ * 
+ * <td><a id="searchengine_name" href="http://www.bing.com/"> <img
+ * id="searchengine_img"
+ * src="http://files.softicons.com/download/internet-cons/social-media-icons-by-icondock/png/32/bing.png"
+ * border="0" ALT="bing" /> </a></td>
+ */
+var SearchEngineObjects = {
+    "Google" : {
+        id : 0,
+        name : "Google",
+        action : "http://www.google.com/search",
+        link : "http://www.google.com",
+        icon : "gicon.png"
+    },
+    "Bing" : {
+        id : 1,
+        name : "Bing",
+        action : "http://www.bing.com/search",
+        link : "http://www.bing.com",
+        icon : "bing.png"
+    },
+    "Baidu" : {
+        id : 2,
+        name : "Baidu",
+        action : "http://www.baidu.com/search",
+        link : "http://www.baidu.com",
+        icon : "baidu.png"
+    },
+
+};
+
+function updateSearchEngine() {
+    var user_chosen = document.getElementById("select_searchengine");
+    var searchengine_form = document.getElementById("searchegnine_form");
+
+    if (debug) {
+        console.log("choosed, selected index:" + user_chosen.selectedIndex);
+        console.log("               his size:" + user_chosen.size);
+        console.log("               his type:" + user_chosen.type);
+    }
+
+    if (user_chosen.selectedIndex >= 0 && user_chosen.selectedIndex <= 1) {
+        if (debug) {
+            console.log("current form action:" + searchengine_form.action);
+        }
+        searchengine_form.action = SearchEngineObjects[user_chosen.value]["action"];
+        document.getElementById("search_icon").href = SearchEngineObjects[user_chosen.value]["link"];
+        document.getElementById("searchengine_img").src = SearchEngineObjects[user_chosen.value]["icon"];
+        document.getElementById("searchengine_img").ALT = SearchEngineObjects[user_chosen.value]["name"];
+    }
+}
+
+window.onload = create_siterow;
+</script>
+
+</head>
+<body>
+    <div align="center" class="header">
+        <table width="80%"  border="0" class="title_table">
+            <tr>
+                <td>
+                    <div class="title_fonts">
+                        <!--<img src="/siterows/static/logo.gif" alt="Site Rows"/> -->
+                        <img src="logo.gif" alt="Site Rows"/>
+                    </div>
+               </td>
+                <td>
+                    <!---->
+                    <form id="searchegnine_form" method="get"
+                        action="http://www.bing.com/search">
+                        <!-- 
+                        <input id="bing_form" type="hidden" name="FORM" value="FREEWS" />
+                         -->
+                        <!-- 
+                    <form id="searchegnine" method="get" action="http://www.google.com/#"> 
+                     -->
+                        <!-- 
+                     <form id="searchegnine" method="get" action="http://www.baidu.com/s">
+                       -->
+                        <table>
+                            <tr>
+                                <td><a id="search_icon"
+                                    href="http://www.bing.com/"> <img
+                                        id="searchengine_img"
+                                        src="http://www.bing.com/siteowner/s/siteowner/Logo_51x19_Dark.png"
+                                        border="0" alt="bing" height="40px" />
+                                </a></td>
+                                <td><input id="search_txt" type="text"
+                                    name="q" size="30" /> <!-- baidu is using wd
+                                    <input id="search_txt" type="text" name="wd" size="30" />
+                                    --> <input type="submit" value="Search Web" />
+                                </td>
+                                <td><select id="select_searchengine"
+                                    onchange="updateSearchEngine()">
+                                        <optgroup label="General Search">
+                                            <option value="Google">Google</option>
+                                            <option value="Bing">Bing</option>
+                                            <!-- 
+                                            <option value="Baidu">Baidu</option>
+                                             -->
+                                        </optgroup>
+                                        <optgroup label="Domain Search">
+                                        </optgroup>
+                                </select>
+                                </td>
+
+                                <td>
+                                    <!-- this part will download a lot junk code from online, for safety reason removed -->
+                                    <!-- Lockerz Share BEGIN --> <!--
+                                    <a class="a2a_dd" href="http://www.addtoany.com/share_save"><img src="http://static.addtoany.com/buttons/share_save_171_16.png" width="171" height="16" border="0" alt="Share"/></a>
+                                    <script type="text/javascript" src="http://static.addtoany.com/menu/page.js"></script>
+                                    --> <!-- Lockerz Share END --></td>
+
+                            </tr>
+
+                        </table>
+                    </form>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <div align="center">
+        <table width="80%" border="0">
+            <tr>
+                <td>&nbsp;</td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- Favorite area -->
+    <div align="center">
+        <table width="80%" border="0" id="selected_table">
+            <tr>
+                <td width=100 class="heading-A">Selected Sites</td>
+                <td><hr /></td>
+            </tr>
+        </table>
+    </div>
+
+
+    <div align="center">
+        <table id="favorite" width="80%" border="0" align="center">
+        </table>
+    </div>
+
+    <!-- Sites area -->
+    <div align="center">
+        <table width="80%" border="0">
+            <tr>
+                <td width=100 class="heading-A">Siterows</td>
+                <td><hr />
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <div align="center">
+        <table id="sites" width="80%" border="0">
+        </table>
+    </div>
+    
+    <div align="center" class="padding_div_before_foot">
+    </div>
+
+    <div align="center" class="foot_div">
+    </div>
+
+</body>
 </html>
