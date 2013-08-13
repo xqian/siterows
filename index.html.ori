@@ -240,37 +240,6 @@ function onDragStart(e) {
     e.dataTransfer.setData("Text", e.target.id);
 }
 
-function onTouchStart(e) {
-     e.dataTransfer.setData("Text", e.target.id);
-}
-
-function onTouchEnd(e) {
-   e.preventDefault();
-    var fromId = e.dataTransfer.getData("Text");
-
-    //swap_position(fromId, toId);
-    // now change the toId content.
-    var toId = e.target.id;
-    var pos=getFavoritePositionByFavoriteId(toId)
-    var index_on_post=document.getElementById("favorite" + pos).site_index
-
-    my_print( "drap, from:"+fromId+", to:"+toId
-            +", pos:"+getFavoritePositionByFavoriteId(toId)
-            +", pos's index:"+index_on_post);
-
-    swap_position(fromId,SiteObjects[index_on_post].id);
-
-    // Todo: Save to customer web storage.
-    saveToWebStorage(toId,fromId);
-}
-
-function onTouchMove(e) {
-    if (e.targetTouches.length == 1) {
-        var touch = e.targetTouches[0];
-        obj.style.left = touch.pageX + 'px';
-        obj.style.top = touch.pageY + 'px';
-    }
-}
 /* Define the site list 
  * 
    The id in this array is different than the array index;
@@ -1212,9 +1181,7 @@ function create_favorite_table(FavoriteRow)
         td.site_index = index;
         my_print("current index:" + index + ", src_id:" + src_id);
         td.innerHTML = '<a href=\"' + SiteObjects[index].link + '\">' + ' <img' + ' onDrop=onDrop(event) onDragover=onDragOver(event)' + ' id= ' + "favorite_" + src_id + ' src=\"' + SiteObjects[index].icon + '\" ' + ' ALT=\"' + SiteObjects[index].display + '\"' + ' border=\"0\" class=\"selectedIconImg\" />' + '  </a>';
-        
-        td.addEventListener("touchend", "onTouchEnd(e)");
-        
+
         tr2.appendChild(td);
 
         /* the display */
@@ -1265,9 +1232,6 @@ function create_site_objects_table()
         td2.setAttribute("draggable", "true");
         td2.setAttribute("ondragstart", "onDragStart(event)");
 
-        td2.addEventListener("touchstart", "onTouchStart(e)");
-        td2.addEventListener("touchmove", "onTouchMove(e)");
-        
         td2.innerHTML = '<a id=' + id + '  href=\"' + SiteObjects[i * 6 + j].link + '\">' + SiteObjects[i * 6 + j].display + '  </a>';
         tr.appendChild(td2);
       }

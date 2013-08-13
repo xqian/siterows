@@ -1262,8 +1262,8 @@ function create_site_objects_table()
         var td2 = document.createElement("td");
         //td will have same id as the object
         td2.setAttribute("id", id);
-        td2.setAttribute("draggable", "true");
-        td2.setAttribute("ondragstart", "onDragStart(event)");
+       // td2.setAttribute("draggable", "true");
+       // td2.setAttribute("ondragstart", "onDragStart(event)");
 
         td2.addEventListener("touchstart", "onTouchStart(e)");
         td2.addEventListener("touchmove", "onTouchMove(e)");
