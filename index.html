@@ -245,7 +245,7 @@ function onTouchStart(e) {
 }
 
 function onTouchEnd(e) {
-   e.preventDefault();
+    e.preventDefault();
     var fromId = e.dataTransfer.getData("Text");
 
     //swap_position(fromId, toId);
@@ -1213,7 +1213,8 @@ function create_favorite_table(FavoriteRow)
         my_print("current index:" + index + ", src_id:" + src_id);
         td.innerHTML = '<a href=\"' + SiteObjects[index].link + '\">' + ' <img' + ' onDrop=onDrop(event) onDragover=onDragOver(event)' + ' id= ' + "favorite_" + src_id + ' src=\"' + SiteObjects[index].icon + '\" ' + ' ALT=\"' + SiteObjects[index].display + '\"' + ' border=\"0\" class=\"selectedIconImg\" />' + '  </a>';
         
-        td.addEventListener("touchend", "onTouchEnd(e)");
+        
+        td.addEventListener("touchend", onTouchEnd, false);
         
         tr2.appendChild(td);
 
@@ -1265,8 +1266,8 @@ function create_site_objects_table()
         td2.setAttribute("draggable", "true");
         td2.setAttribute("ondragstart", "onDragStart(event)");
 
-        td2.addEventListener("touchstart", "onTouchStart(e)");
-        td2.addEventListener("touchmove", "onTouchMove(e)");
+        td2.addEventListener("touchstart", onTouchStart, false);
+        td2.addEventListener("touchmove", onTouchMove, false);
         
         td2.innerHTML = '<a id=' + id + '  href=\"' + SiteObjects[i * 6 + j].link + '\">' + SiteObjects[i * 6 + j].display + '  </a>';
         tr.appendChild(td2);
