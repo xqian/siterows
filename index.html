@@ -2,7 +2,7 @@
 
 <html lang="en">
 <head>
-<title>Siterow - Stick with us, stay cool!</title>
+<title>Stay Cool</title>
 <meta charset="utf-8">
 
 <style type="text/css">
@@ -71,9 +71,9 @@ body {
  *  use cache to make getIndexById and getFavoriteIndexById and find_site_obj_index_from_pos hagve O(1) complexcity
  * */
 
-debug = 0
+debug = 1
 local_icons = 1
-using_default_favorites = 1
+using_default_favorites = 0
 
 
 function my_print(str){
@@ -167,6 +167,7 @@ function put_site_id_to_favorite_pos(id, pos)
     if (0<=pos && pos<FavoriteRow_Item_count)
     {
         toId="favorite_"+pos
+        saveToWebStorage(toId,id);
     }
     else
     {
@@ -184,7 +185,10 @@ function put_site_id_to_favorite_pos(id, pos)
     var target = document.getElementById(toId);
     target.setAttribute("src", SiteObjects[index].icon);
     target.setAttribute("alt", SiteObjects[index].display);
-    
+    //img_a
+    var target1=document.getElementById(toId + "_img_a");
+    target1.setAttribute("href", SiteObjects[Number(index)].link);
+
     //A
     var target2 = document.getElementById(toId + "_display");    
     target2.setAttribute("href", SiteObjects[Number(index)].link);
@@ -218,6 +222,7 @@ function onDrop(e) {
 
     //swap_position(fromId, toId);
     // now change the toId content.
+    // toId is the to position
     var toId = e.target.id;
     var pos=getFavoritePositionByFavoriteId(toId)
     var index_on_post=document.getElementById("favorite" + pos).site_index
@@ -227,9 +232,6 @@ function onDrop(e) {
             +", pos's index:"+index_on_post);
 
     swap_position(fromId,SiteObjects[index_on_post].id);
-
-    // Todo: Save to customer web storage.
-    saveToWebStorage(toId,fromId);
 }
 
 function onDragOver(e) {
@@ -259,9 +261,6 @@ function onTouchEnd(e) {
             +", pos's index:"+index_on_post);
 
     swap_position(fromId,SiteObjects[index_on_post].id);
-
-    // Todo: Save to customer web storage.
-    saveToWebStorage(toId,fromId);
 }
 
 function onTouchMove(event) {
@@ -1096,12 +1095,13 @@ function create_siterow()
         {
             for (var i = 0; i < FavoriteRow["row1"].length; i++)
             {
-            var src_index = (row - 1) * (FavoriteRow["row1"].length) + i;
-            my_print("ReadFromWebStorage 0:" + ReadFromWebStorage("favorite_"+src_index));
-            var id = ReadFromWebStorage("favorite_" + src_index);
+            var pos = (row - 1) * (FavoriteRow["row1"].length) + i;
+            my_print("ReadFromWebStorage 0:" + ReadFromWebStorage("favorite_"+pos));
+            var id = ReadFromWebStorage("favorite_" + pos);
             FavoriteRow["row" + row][i] = id;
             var index=getIndexById(id)
-            SiteObjects[index].position = src_index;
+            SiteObjects[index].position = pos;
+            my_print("      Read out, pos:" +pos+ ", id:" +id+ ", index:"+index+", index'p:"+SiteObjects[index].position);
             }
         }
     }
@@ -1133,6 +1133,8 @@ function create_siterow()
             }
         }
 
+    my_print("index[32]'p:"+SiteObjects[32].position);
+
     create_favorite_table(FavoriteRow);
     
     create_site_objects_table();
@@ -1148,7 +1150,11 @@ function create_favorite_table(FavoriteRow)
       {
         for (var i = 0; i < FavoriteRow["row1"].length; i++)
         {
-          console.log("FavoriteRow after init2, " + row + "," + i + "," + FavoriteRow["row" + row][i]);
+          console.log("FavoriteRow after init2, " + row + "," + i + ", id:" + FavoriteRow["row" + row][i]);
+          var favorite_id=FavoriteRow["row" + row][i];
+          var index=getIndexById(favorite_id);
+          my_print("index[32]'p:"+SiteObjects[32].position);
+          console.log("     index:"+index+", index'p:"+SiteObjects[index].position);
         }
       }
 
@@ -1209,6 +1215,7 @@ function create_favorite_table(FavoriteRow)
         var src_id = (row - 1) * (FavoriteRow["row" + row].length) + i;
         
         var index = find_site_obj_index_from_pos(src_id);
+        my_print("favorite item, pos:"+ src_id+" index:"+index+", src_id:"+src_id);
         var id=SiteObjects[index].id;
 
         my_print("working on favoritem, pos:" + src_id + ", id:" + id + ", index:" +index);
@@ -1217,7 +1224,7 @@ function create_favorite_table(FavoriteRow)
         td.class = "SelectSitesIcon";
         td.site_index = index;
         my_print("current index:" + index + ", src_id:" + src_id);
-        td.innerHTML = '<a href=\"' + SiteObjects[index].link + '\">' + ' <img' + ' onDrop=onDrop(event) onDragover=onDragOver(event)' + ' id= ' + "favorite_" + src_id + ' src=\"' + SiteObjects[index].icon + '\" ' + ' ALT=\"' + SiteObjects[index].display + '\"' + ' border=\"0\" class=\"selectedIconImg\" />' + '  </a>';
+        td.innerHTML = '<a id=favorite_'+src_id+'_img_a href=\"' + SiteObjects[index].link + '\">' + ' <img' + ' onDrop=onDrop(event) onDragover=onDragOver(event)' + ' id= ' + "favorite_" + src_id + ' src=\"' + SiteObjects[index].icon + '\" ' + ' ALT=\"' + SiteObjects[index].display + '\"' + ' border=\"0\" class=\"selectedIconImg\" />' + '  </a>';
         
         
         td.addEventListener("touchend", onTouchEnd, false);
